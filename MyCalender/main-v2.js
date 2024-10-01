@@ -1,8 +1,8 @@
 "use strict";
 
 {
-  const year = 2020;
-  const month = 4; // 5月
+  let year = 2020;
+  let month = 4; // 5月
 
   // 関数：先月分の日付を作成
   function getCalenderHead() {
@@ -100,7 +100,25 @@
 
   }
 
+  // 前月ボタンの処理
+  document.getElementById('prev').addEventListener('click', () => {
+    month--;
+    if (month < 0) {
+      year--;
+      month = 11;
+    }
+    createCalender();
+  })
 
+  // 翌月ボタンの処理
+  document.getElementById('next').addEventListener('click', () => {
+    month++;
+    if (month > 11) {
+      year++;
+      month = 0;
+    }
+    createCalender();
+  })
 
   createCalender();
 
