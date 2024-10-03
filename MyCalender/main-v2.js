@@ -1,8 +1,11 @@
 "use strict";
-
+console.clear;
 {
-  let year = 2020;
-  let month = 4; // 5月
+
+  // 今日の日付で作成
+  const today = new Date();
+  let year = today.getFullYear();
+  let month = today.getMonth(); // 5月
 
   // 関数：先月分の日付を作成
   function getCalenderHead() {
@@ -28,7 +31,7 @@
 
   // 関数：今月分の日付を作成
   function getCalenderBody() {
-    const dates = [];　　// date: 日付, day: 曜日
+    const dates = [];// date: 日付, day: 曜日
     // 今月の末日を取得
     const lastDate = new Date(year, month + 1, 0).getDate();
     // ループでdatesにpushしていく
@@ -39,6 +42,12 @@
         isDisabled: false,
       });
     }
+
+    // 今日を太字にする
+    if (year === today.getFullYear() && month === today.getMonth()) {
+      dates[today.getDate() - 1].isToday = true;
+    }
+
     return dates;
 
   }
@@ -60,28 +69,43 @@
 
   }
 
-  // すべての日付を統合する
-  function createCalender() {
+  // 更新前のカレンダーを削除
+  function clearCalender() {
+    const tbody =  document.querySelector('tbody');
+
+    while (tbody.firstChild) {
+     tbody.removeChild(tbody.firstChild)
+    }
+  }
+
+  //  タイトルの書き換え
+  function renderTitle() {
+  const title = `${year}/${String(month + 1).padStart(2, '0')}`;
+  document.getElementById('title').textContent = title;
+  }
+
+  function renderWeeks() {
     const dates = [
+      // スプレッド構文で広げる
       ...getCalenderHead(),
       ...getCalenderBody(),
       ...getCalenderTail(),
     ];
 
 
-    // 週ごとの配列を作成
+    // 週ごとの配列を作成(HTMLに描画するため)
     const weeks = [];
     const weeksCount = dates.length / 7;
 
     for(let i = 0; i < weeksCount; i++) {
-      // 配列weeksにdatesの中身を７日分格納する
+      // 配列weeksにdatesの中身を７日分ずつ格納する
       weeks.push(dates.splice(0,7));
     }
 
-    // weeksの各配列への処理
+    // weeksの各配列（１週間分ずつ）への処理
     weeks.forEach(week => {
       const tr = document.createElement('tr');
-      // 個々の配列に対して
+      // 日付に対して
       week.forEach(date => {
         const td = document.createElement('td');
         // 日付・isToday・isDisabledの指定
@@ -94,9 +118,18 @@
         }
         tr.appendChild(td);
       });
-      // 最後にtbodyに追加（描画完了）
+      // 処理したweekをtbodyに追加
       document.querySelector('tbody').appendChild(tr)
     });
+  }
+
+  // すべての日付を統合する
+  function createCalender() {
+
+    clearCalender();
+    renderTitle();
+    renderWeeks();
+
 
   }
 
@@ -117,6 +150,12 @@
       year++;
       month = 0;
     }
+    createCalender();
+  })
+  // Todayボタンの処理
+  document.getElementById('today').addEventListener('click', () => {
+    year = today.getFullYear();
+    month = today.getMonth();
     createCalender();
   })
 
