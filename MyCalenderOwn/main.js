@@ -26,16 +26,12 @@ console.clear();
 
   // }
 
-
   // 月末日を算出する関数
   function getLastDayOfMonth(year, month) {
     // 翌月の0日目 (つまり前月の末日) を指定
     const date = new Date(year, month + 1, 0);
     // 日付だけを返す
     return date.getDate();
-
-
-
   }
 
   function getCalenderHead() {
@@ -44,21 +40,31 @@ console.clear();
     const d = new Date(year, month, 0).getDate();
     // 前月分が何日分存在するか
     const n = new Date(year, month, 1).getDay();
-    console.log(n);
 
     for (let i = 0; i < n; i++) {
-      dates.unshift(
-        {
-          date: d - i,
-          isToday: false,
-          isDisabled: true,
-        }
-      );
+      dates.unshift({
+        date: d - i,
+        isToday: false,
+        isDisabled: true,
+      });
     }
-    console.log(dates);
+    return dates;
   }
+  function getCalenderBody() {
+    let dates = [];
+    // 月末を求める
+    const lastDate = getLastDayOfMonth(year, month);
 
-
+    for (let i = 1; i <= lastDate; i++) {
+      // 先月か翌月か、今日か
+      dates.push({
+        date: i,
+        isDisabled: false,
+        isToday: false,
+      });
+    }
+    return dates;
+  }
   function getCalenderTail() {
     const dates = [];
     const lastDay = new Date(year, month + 1, 0).getDay();
@@ -70,29 +76,37 @@ console.clear();
         isDisabled: true,
       });
     }
-
+    return dates;
   }
 
+  // 全てのカレンダーを統合
+  function createCalender() {
+    const dates = [...getCalenderHead(), ...getCalenderBody(), ...getCalenderTail()];
 
+    const weeks = [];
+    const weeksCount = dates.length / 7;
 
-  function getCalenderBody() {
-    let dates = [];
-    // 月末を求める
-    const lastDate = getLastDayOfMonth(year, month);
-    console.log(lastDate);
-
-    for (let i = 1; i <= lastDate; i++) {
-      // 先月か翌月か、今日か
-      dates.push({
-        date: i,
-        isDisabled: false,
-        isToday: false,
-      });
+    for (let i = 0; i < weeksCount; i++) {
+      weeks.push(dates.splice(0, 7));
     }
 
+    weeks.forEach(week => {
+      const tr = document.createElement('tr');
+      week.forEach(date => {
+        const td = document.createElement('td');
+
+        td.textContent = date.date;
+        if (date.isToday) {
+          td.classList.add('today');
+        }
+        if (date.isDisabled) {
+          td.classList.add('disabled');
+        }
+        tr.appendChild(td);
+        document.querySelector('tbody').appendChild(tr);
+      });
+    });
   }
 
-  getCalenderBody();
-  getCalenderHead();
-  getCalenderTail();
+  createCalender();
 }
